@@ -1,9 +1,12 @@
 import { books, authors, genres, BOOKS_PER_PAGE } from './data.js'
-import { createPreviewElement } from './abstraction/previewelement.js'
+import { createPreviewElement } from './abstraction/previewElement.js'
 import { setupTheme, handleThemeChange } from './abstraction/theme.js'
+import { populateDropdown } from './abstraction/dropdownList.js';
 
 let page = 1;
 let matches = books
+
+//----------------------Book Preview Element------------------------//
 
 const starting = document.createDocumentFragment();
 
@@ -20,33 +23,25 @@ for (const { author, id, image, title } of matches.slice(0, BOOKS_PER_PAGE)) {
 
 document.querySelector('[data-list-items]').appendChild(starting)
 
+//-----------------------Genres--------------------------------------//
+
 const genreHtml = document.createDocumentFragment()
 const firstGenreElement = document.createElement('option')
 firstGenreElement.value = 'any'
 firstGenreElement.innerText = 'All Genres'
 genreHtml.appendChild(firstGenreElement)
-
-for (const [id, name] of Object.entries(genres)) {
-    const element = document.createElement('option')
-    element.value = id
-    element.innerText = name
-    genreHtml.appendChild(element)
-}
+populateDropdown(genres, genreHtml) // Abstracted function to populate genres
 
 document.querySelector('[data-search-genres]').appendChild(genreHtml)
+
+//------------------------Authors------------------------------------//
 
 const authorsHtml = document.createDocumentFragment()
 const firstAuthorElement = document.createElement('option')
 firstAuthorElement.value = 'any'
 firstAuthorElement.innerText = 'All Authors'
 authorsHtml.appendChild(firstAuthorElement)
-
-for (const [id, name] of Object.entries(authors)) {
-    const element = document.createElement('option')
-    element.value = id
-    element.innerText = name
-    authorsHtml.appendChild(element)
-}
+populateDropdown(authors, authorsHtml) // Abstracted function to populate authors 
 
 document.querySelector('[data-search-authors]').appendChild(authorsHtml)
 
@@ -59,7 +54,7 @@ document.querySelector('[data-settings-form]').addEventListener('submit', (event
     const { theme } = Object.fromEntries(formData);
     handleThemeChange(theme);
 });
-//-------------------------------------------------------------------//
+//----------------------------Event Listeners--------------------------//
 
 document.querySelector('[data-list-button]').innerText = `Show more (${books.length - BOOKS_PER_PAGE})`
 document.querySelector('[data-list-button]').disabled = (matches.length - (page * BOOKS_PER_PAGE)) > 0
@@ -90,7 +85,7 @@ document.querySelector('[data-list-close]').addEventListener('click', () => {
     document.querySelector('[data-list-active]').open = false
 })
 
-
+//---------------------------------------------------------------------//
 
 document.querySelector('[data-search-form]').addEventListener('submit', (event) => {
     event.preventDefault()
@@ -128,22 +123,12 @@ document.querySelector('[data-search-form]').addEventListener('submit', (event) 
     const newItems = document.createDocumentFragment()
 
     for (const { author, id, image, title } of result.slice(0, BOOKS_PER_PAGE)) {
-        const element = document.createElement('button')
-        element.classList = 'preview'
-        element.setAttribute('data-preview', id)
-    
-        element.innerHTML = `
-            <img
-                class="preview__image"
-                src="${image}"
-            />
-            
-            <div class="preview__info">
-                <h3 class="preview__title">${title}</h3>
-                <div class="preview__author">${authors[author]}</div>
-            </div>
-        `
-
+        const element = createPreviewElement({
+           id,
+           image,
+           title,
+           author: authors[author]
+    });
         newItems.appendChild(element)
     }
 
@@ -163,21 +148,12 @@ document.querySelector('[data-list-button]').addEventListener('click', () => {
     const fragment = document.createDocumentFragment()
 
     for (const { author, id, image, title } of matches.slice(page * BOOKS_PER_PAGE, (page + 1) * BOOKS_PER_PAGE)) {
-        const element = document.createElement('button')
-        element.classList = 'preview'
-        element.setAttribute('data-preview', id)
-    
-        element.innerHTML = `
-            <img
-                class="preview__image"
-                src="${image}"
-            />
-            
-            <div class="preview__info">
-                <h3 class="preview__title">${title}</h3>
-                <div class="preview__author">${authors[author]}</div>
-            </div>
-        `
+        const element = createPreviewElement({
+            id,
+            image,
+            title,
+            author: authors[author]
+     });
 
         fragment.appendChild(element)
     }
