@@ -1,5 +1,5 @@
 import { books, authors, genres, BOOKS_PER_PAGE } from './data.js'
-import { createPreviewElement } from './abstraction/previewElement.js'
+import { createBookPreview } from './abstraction/previewElement.js'
 import { setupTheme, handleThemeChange } from './abstraction/theme.js'
 import { populateDropdown } from './abstraction/dropdownList.js';
 
@@ -11,7 +11,7 @@ let matches = books
 const starting = document.createDocumentFragment();
 
 for (const { author, id, image, title } of matches.slice(0, BOOKS_PER_PAGE)) {
-    const element = createPreviewElement({
+    const element = createBookPreview({
         id,
         image,
         title,
@@ -123,7 +123,7 @@ document.querySelector('[data-search-form]').addEventListener('submit', (event) 
     const newItems = document.createDocumentFragment()
 
     for (const { author, id, image, title } of result.slice(0, BOOKS_PER_PAGE)) {
-        const element = createPreviewElement({
+        const element = createBookPreview({
            id,
            image,
            title,
@@ -148,7 +148,7 @@ document.querySelector('[data-list-button]').addEventListener('click', () => {
     const fragment = document.createDocumentFragment()
 
     for (const { author, id, image, title } of matches.slice(page * BOOKS_PER_PAGE, (page + 1) * BOOKS_PER_PAGE)) {
-        const element = createPreviewElement({
+        const element = createBookPreview({
             id,
             image,
             title,
